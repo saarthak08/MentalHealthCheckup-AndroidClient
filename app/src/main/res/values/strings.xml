@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MentalFitness</string>
+    <string name="accessibility_service_label">MentalFitness</string>
+    <string name="accessibility_description">You need to give us accessibility permissions in order to track your mental health via keystrokes.
+We cannot track your mental fitness without accessibility permissions. We promise not to use your data illegally.</string>
+</resources>
