@@ -43,13 +43,25 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences pref;
     SharedPreferences.Editor editor;
     int PRIVATE_MODE = 0;
-
-
+    public static final String PREFER_NAME = "MHC";
+    public static final String IS_USER_LOGIN = "IsUserLoggedIn";
+    public static final String KEY_NAME = "username";
     LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pref=getSharedPreferences(PREFER_NAME,PRIVATE_MODE);
+        if(pref.contains(IS_USER_LOGIN)){
+            boolean t=pref.getBoolean(IS_USER_LOGIN,false);
+            if(t){
+                String username=pref.getString(KEY_NAME,"");
+                Intent i=new Intent(MainActivity.this,HomeActivity.class);
+                i.putExtra("username",username);
+                startActivity(i);
+                MainActivity.this.finish();
+            }
+        }
         setContentView(R.layout.activity_main);
         editText=findViewById(R.id.editText);
         button=findViewById(R.id.button);
@@ -85,6 +97,11 @@ public class MainActivity extends AppCompatActivity {
                                     progressBar.setVisibility(View.GONE);
                                     Intent i=new Intent(MainActivity.this,HomeActivity.class);
                                     i.putExtra("username",input);
+                                    pref = MainActivity.this.getSharedPreferences(PREFER_NAME, PRIVATE_MODE);
+                                    editor = pref.edit();
+                                    editor.putString(KEY_NAME,input);
+                                    editor.putBoolean(IS_USER_LOGIN,true);
+                                    editor.commit();
                                     startActivity(i);
                                     MainActivity.this.finish();
                                 }

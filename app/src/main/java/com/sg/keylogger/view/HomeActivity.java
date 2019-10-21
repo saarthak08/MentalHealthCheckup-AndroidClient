@@ -2,13 +2,20 @@ package com.sg.keylogger.view;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -22,6 +29,7 @@ import com.sg.keylogger.services.network.CallService;
 import com.sg.keylogger.services.network.RetrofitInstance;
 
 import java.security.Key;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +42,13 @@ public class HomeActivity extends AppCompatActivity {
     MaterialDialog notice;
     boolean enable=false;
     String username;
+    SharedPreferences pref;
+    SharedPreferences.Editor editor;
+    int PRIVATE_MODE = 0;
+    SwipeRefreshLayout swipeRefreshLayout;
+    public static final String PREFER_NAME = "MHC";
+    public static final String IS_USER_LOGIN = "IsUserLoggedIn";
+    public static final String KEY_NAME = "username";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
             username=x.getStringExtra("username");
         }
         getSupportActionBar().setTitle(username);
+        swipeRefreshLayout=findViewById(R.id.srefreshL);
         Intent i=new Intent(HomeActivity.this, KeyLogger.class);
         getApplicationContext().startService(i);
         KeyLogger.username=username;
@@ -54,6 +70,18 @@ public class HomeActivity extends AppCompatActivity {
         else{
             floatingActionButton.setImageResource(android.R.drawable.ic_media_play);
         }
+        swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.DKGRAY, Color.RED,Color.GREEN,Color.MAGENTA,Color.BLACK,Color.CYAN);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                },4000);
+            }
+        });
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,5 +157,32 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.Logout) {
+            pref=getSharedPreferences(PREFER_NAME,PRIVATE_MODE);
+            editor = pref.edit();
+            editor.clear();
+            editor.apply();
+            startActivity(new Intent(HomeActivity.this,MainActivity.class));
+            HomeActivity.this.finish();
+            return true;
+        }
+        else if(id==R.id.refreshData){
+
+        }
+        else if(id==R.id.ChooseApps){
+            startActivity(new Intent(HomeActivity.this,SelectedAppsActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
